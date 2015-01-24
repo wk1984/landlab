@@ -14,11 +14,11 @@ class BmiStreamPower(object):
     _input_var_names = ('land_surface__elevation', )
     _output_var_names = (
         'land_surface__elevation',
-        'land_surface_water_suspended-sediment__divergence_of_mass_flow_rate',
+        'land_surface_water_suspended-sediment__divergence_of_volume_flow_rate',
     )
     _var_units = {
         'land_surface__elevation': 'm',
-        'land_surface_water_suspended-sediment__divergence_of_mass_flow_rate': '',
+        'land_surface_water_suspended-sediment__divergence_of_volume_flow_rate': 'm/y',
     }
     def __init__(self):
         self._diffusion = None
@@ -43,7 +43,7 @@ class BmiStreamPower(object):
 
         self._values = {
             'land_surface__elevation': self._grid.at_node['landscape_surface__elevation'],
-            'land_surface_water_suspended-sediment__divergence_of_mass_flow_rate': self._grid.at_node['sediment_flux_divergence'],
+            'land_surface_water_suspended-sediment__divergence_of_volume_flow_rate': self._grid.at_node['sediment_flux_divergence'],
         }
 
     def update(self):
