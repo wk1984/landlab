@@ -1,13 +1,13 @@
 #! /usr/bin/env python
 import numpy as np
 
-from .diffusion import Diffusion
+from .diffusion import DiffusionComponent
 
 from ...core.model_parameter_dictionary import ModelParameterDictionary
 from ...grid.raster import RasterModelGrid
 
 
-class BmiStreamPower(object):
+class BmiDiffusion(object):
     """BMI implementation of the landlab diffusion component.
     """
     _name = 'Diffusion'
@@ -38,8 +38,8 @@ class BmiStreamPower(object):
         self._grid = RasterModelGrid(int(params['nrows']),
                                      int(params['ncols']),
                                      float(params['dx']))
-        self._diffusion = Diffusion(self._grid, input_stream=params,
-                                    current_time=0.)
+        self._diffusion = DiffusionComponent(self._grid, input_stream=params,
+                                             current_time=0.)
 
         self._values = {
             'land_surface__elevation': self._grid.at_node['landscape_surface__elevation'],
