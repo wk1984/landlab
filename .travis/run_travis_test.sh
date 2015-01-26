@@ -9,6 +9,7 @@ run_test()
 
   INSTALLDIR=$($PYTHON -c "import os; import landlab; print(os.path.dirname(landlab.__file__))")
 
+  conda list
   coverage run --source=$INSTALLDIR ../scripts/test-installed-landlab.py --doctest && (coverage report && cp .coverage ..)
 }
 
