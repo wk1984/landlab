@@ -83,7 +83,7 @@ class BmiSoilMoisture(object):
     to advance the component until a particular time.
 
     >>> sm.update_until(2.3)
-    >>> sm.get_current_time()
+    >>> print round(sm.get_current_time(), 6)
     2.3
     """
     _name = 'Soil Moisture'
@@ -239,7 +239,7 @@ class BmiSoilMoisture(object):
         >>> sm.get_current_time()
         0.0
         >>> sm.update_until(10.2)
-        >>> sm.get_current_time()
+        >>> print round(sm.get_current_time(), 6)
         10.2
         """
         n_steps = (then - self.get_current_time()) / self.get_time_step()
