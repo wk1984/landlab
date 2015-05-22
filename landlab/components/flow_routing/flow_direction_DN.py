@@ -204,6 +204,8 @@ def flow_directions(elev, active_links, fromnode, tonode, link_slope,
         elif method == 'weave':
             from .weavefuncs import adjust_flow_receivers
 
+        active_links = active_links.astype(np.int)
+
         print fromnode.dtype
         print tonode.dtype
         print active_links.dtype
