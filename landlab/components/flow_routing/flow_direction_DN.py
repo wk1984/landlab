@@ -180,8 +180,8 @@ def flow_directions(elev, active_links, fromnode, tonode, link_slope,
     num_nodes = len(elev)
     steepest_slope = np.zeros(num_nodes)
     receiver = np.arange(num_nodes)
-    receiver_link = UNDEFINED_INDEX + np.zeros(num_nodes, dtype=int)
-    
+    receiver_link = UNDEFINED_INDEX + np.zeros_like(receiver)
+
     # For each link, find the higher of the two nodes. The higher is the
     # potential donor, and the lower is the potential receiver. If the slope
     # from donor to receiver is steeper than the steepest one found so far for
@@ -203,6 +203,12 @@ def flow_directions(elev, active_links, fromnode, tonode, link_slope,
             from .cfuncs import adjust_flow_receivers
         elif method == 'weave':
             from .weavefuncs import adjust_flow_receivers
+
+        print fromnode.dtype
+        print tonode.dtype
+        print active_links.dtype
+        print receiver.dtype
+        print receiver_link.dtype
 
         adjust_flow_receivers(fromnode, tonode, elev, link_slope,
                               active_links, receiver, receiver_link,
