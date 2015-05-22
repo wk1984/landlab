@@ -424,8 +424,8 @@ class ModelGrid(ModelDataFields):
     at_active_link = {} #: Values defined at active links
     at_active_face = {} #: Values defined at active faces
 
-    node_inlink_matrix = numpy.array([], dtype=numpy.int32) #: Nodes on the other end of links pointing into a node.
-    node_outlink_matrix = numpy.array([], dtype=numpy.int32) #: Nodes on the other end of links pointing out of a node.
+    node_inlink_matrix = numpy.array([], dtype=numpy.int) #: Nodes on the other end of links pointing into a node.
+    node_outlink_matrix = numpy.array([], dtype=numpy.int) #: Nodes on the other end of links pointing out of a node.
     
     def __init__(self, **kwds):
         super(ModelGrid, self).__init__()
