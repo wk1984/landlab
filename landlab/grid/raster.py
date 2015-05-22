@@ -1792,6 +1792,12 @@ class RasterModelGrid(ModelGrid, RasterModelGridPlotter):
         if not self._diagonal_links_created:
             self._setup_diagonal_links()
 
+        print 'getting d8 active links'
+        print self.active_links.dtype
+        print self._diag_active_links.dtype
+        print self.activelink_fromnode.dtype
+        print self.activelink_tonode.dtype
+
         return (
             np.concatenate((self.active_links, self._diag_active_links)),
             np.concatenate((self.activelink_fromnode,
