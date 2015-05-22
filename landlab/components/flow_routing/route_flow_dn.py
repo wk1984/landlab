@@ -116,8 +116,8 @@ class FlowRouter(Component):
             self._activelink_from = model_grid.activelink_fromnode
             self._activelink_to = model_grid.activelink_tonode
         print self._active_links.dtype
-        print self._active_links_from.dtype
-        print self._active_links_to.dtype
+        print self._activelink_from.dtype
+        print self._activelink_to.dtype
         
         #test input variables are present:
         model_grid.at_node['topographic_elevation']
