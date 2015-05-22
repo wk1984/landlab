@@ -105,14 +105,19 @@ class FlowRouter(Component):
         # We'll also keep track of the active links; if raster, then these are
         # the "D8" links; otherwise, it's just activelinks
         if type(model_grid) is landlab.grid.raster.RasterModelGrid:
+            print 'd8'
             dal, d8f, d8t = model_grid.d8_active_links()
             self._active_links = dal
             self._activelink_from = d8f
             self._activelink_to = d8t
         else:
+            print 'not d8'
             self._active_links = model_grid.active_links
             self._activelink_from = model_grid.activelink_fromnode
             self._activelink_to = model_grid.activelink_tonode
+        print self._active_links.dtype
+        print self._active_links_from.dtype
+        print self._active_links_to.dtype
         
         #test input variables are present:
         model_grid.at_node['topographic_elevation']
