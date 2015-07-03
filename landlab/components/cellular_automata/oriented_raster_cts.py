@@ -12,8 +12,9 @@ Created GT Sep 2014
 """
 
 from numpy import zeros
-from lcelllab_cts import CellLabCTSModel, Transition
-import landlab
+from .celllab_cts import CellLabCTSModel, Transition
+from ...grid import RasterModelGrid
+
 
 _DEBUG = False
 
@@ -23,10 +24,14 @@ class OrientedRasterCTS(CellLabCTSModel):
     
     Example
     -------
-    >>> mg = landlab.RasterModelGrid(3, 4, 1.0)
+    >>> from landlab import RasterModelGrid
+    >>> from landlab.components.cellular_automata.landlab_ca import Transition
+    >>> from landlab.components.cellular_automata.oriented_raster_cts import OrientedRasterCTS
+
+    >>> mg = RasterModelGrid(3, 4, 1.0)
     >>> nsd = {0 : 'yes', 1 : 'no'}
     >>> xnlist = []
-    >>> xnlist.append( Transition( (0,1,0), (1,1,0), 1.0, 'frogging' ) )
+    >>> xnlist.append(Transition((0,1,0), (1,1,0), 1.0, 'frogging'))
     >>> nsg = mg.add_zeros('node', 'node_state_grid')
     >>> orcts = OrientedRasterCTS(mg, nsd, xnlist, nsg)
     """
@@ -57,8 +62,8 @@ class OrientedRasterCTS(CellLabCTSModel):
             print 'OrientedRasterCTS.__init__ here'
 
         # Make sure caller has sent the right grid type        
-        assert (type(model_grid) is landlab.grid.raster.RasterModelGrid), \
-               'model_grid must be a Landlab RasterModelGrid'
+        if not isinstance(model_grid, RasterModelGrid):
+            raise TypeError('model_grid must be a Landlab RasterModelGrid')
                
         # Define the number of distinct cell-pair orientations: here just 1,
         # because RasterLCA represents a non-oriented CA model.
