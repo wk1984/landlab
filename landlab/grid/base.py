@@ -476,8 +476,19 @@ class ModelGrid(ModelDataFields):
 
     @property
     def boundary_nodes(self):
-        """
-        Node IDs of all boundary nodes.
+        """Node IDs of all boundary nodes.
+
+        Examples
+        --------
+        >>> from landlab import RasterModelGrid
+        >>> rmg = RasterModelGrid((4, 3))
+        >>> rmg.boundary_nodes
+        array([ 0,  1,  2,  3,  5,  6,  8,  9, 10, 11])
+
+        >>> from landlab import HexModelGrid
+        >>> hmg = HexModelGrid(3, 2)
+        >>> hmg.boundary_nodes
+        array([0, 1, 2, 4, 5, 6])
         """
         try:
             return self._boundary_nodes
