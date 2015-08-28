@@ -7,7 +7,7 @@ except ImportError:
     from landlab.testing.tools import assert_is, assert_is_instance
 from nose.tools import (assert_equal, assert_raises)
 
-from landlab.grid import raster_funcs as rfuncs
+from landlab.grid import raster_gradients as rfuncs
 from landlab import RasterModelGrid
 from landlab.testing.tools import assert_array_is_int
 

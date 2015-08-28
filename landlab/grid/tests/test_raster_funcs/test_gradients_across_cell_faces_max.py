@@ -7,7 +7,7 @@ try:
 except ImportError:
     from landlab.testing.tools import assert_is
 
-from landlab.grid import raster_funcs as rfuncs
+from landlab.grid import raster_gradients as rfuncs
 
 
 _GRID = None

@@ -19,7 +19,7 @@ from .base import (CORE_NODE, FIXED_VALUE_BOUNDARY,
                    FIXED_GRADIENT_BOUNDARY, TRACKS_CELL_BOUNDARY,
                    CLOSED_BOUNDARY, BAD_INDEX_VALUE, )
 from landlab.field.scalar_data_fields import FieldError
-from . import raster_funcs as rfuncs
+from . import raster_gradients as rfuncs
 from ..io import write_esri_ascii
 from ..io.netcdf import write_netcdf
 

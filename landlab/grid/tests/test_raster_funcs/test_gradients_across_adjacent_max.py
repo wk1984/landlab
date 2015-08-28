@@ -7,7 +7,7 @@ except ImportError:
     from landlab.testing.tools import assert_is
 from nose.tools import assert_equal
 
-from landlab.grid import raster_funcs as rfuncs
+from landlab.grid import raster_gradients as rfuncs
 
 
 def setup_unit_grid():

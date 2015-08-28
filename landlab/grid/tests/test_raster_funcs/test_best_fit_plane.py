@@ -2,7 +2,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises
 
-from landlab.grid import raster_funcs as rfuncs
+from landlab.grid import raster_gradients as rfuncs
 
 
 def test_best_fit_with_bad_args():
