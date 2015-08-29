@@ -9,7 +9,7 @@ from landlab import RasterModelGrid
 def bench_gradient_across_faces():
     rmg = RasterModelGrid(1000, 1000)
     node_values = rmg.zeros()
-    grads = rmg.calculate_gradient_across_cell_faces(node_values)
+    grads = rmg.gradient_across_cell_face(node_values)
 
 
 def bench_gradient_across_corners():

@@ -2,8 +2,10 @@ import numpy as np
 import six
 from six.moves import range
 
-from .base import CLOSED_BOUNDARY
-from .base import BAD_INDEX_VALUE
+#from .base import CLOSED_BOUNDARY
+#from .base import BAD_INDEX_VALUE
+from landlab.grid.base import CLOSED_BOUNDARY
+from landlab.grid.base import BAD_INDEX_VALUE
 
 
 _VALID_ROUTING_METHODS = set(['d8', 'd4'])
@@ -30,9 +32,9 @@ def _make_optional_arg_into_array(number_of_elements, *args):
     return ids
 
 
-def calculate_gradient_across_cell_faces(grid, node_values, *args, **kwds):
-    """calculate_gradient_across_cell_faces(grid, node_values, [cell_ids], out=None)
-    Gradients across the faces of a cell.
+def gradient_across_cell_face(grid, node_values, *args, **kwds):
+    """gradient_across_cell_face(grid, node_values, [cell_ids], out=None)
+    Calculate gradients across the faces of a cell.
 
     Calculate gradient of the value field provided by *node_values* across
     each of the faces of the cells of a grid. The returned gradients are
@@ -64,13 +66,13 @@ def calculate_gradient_across_cell_faces(grid, node_values, *args, **kwds):
     Create a grid with two cells.
 
     >>> from landlab import RasterModelGrid
-    >>> from landlab.grid.raster_gradients import calculate_gradient_across_cell_faces
+    >>> from landlab.grid.raster_gradients import gradient_across_cell_face
     >>> grid = RasterModelGrid(3, 4)
     >>> x = np.array([0., 0., 0., 0., 0., 0., 1., 1., 3., 3., 3., 3.])
 
     A decrease in quantity across a face is a negative gradient.
     
-    >>> calculate_gradient_across_cell_faces(grid, x)
+    >>> gradient_across_cell_face(grid, x)
     masked_array(data =
      [[ 1.  3.  0.  0.]
      [ 0.  2. -1. -1.]],
@@ -490,7 +492,7 @@ def calculate_steepest_descent_across_cell_faces(grid, node_values, *args,
 
     cell_ids = _make_optional_arg_into_array(grid.number_of_cells, *args)
 
-    grads = calculate_gradient_across_cell_faces(grid, node_values, cell_ids)
+    grads = gradient_across_cell_face(grid, node_values, cell_ids)
 
     if return_node:
         ind = np.argmin(grads, axis=1)

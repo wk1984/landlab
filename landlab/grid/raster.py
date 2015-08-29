@@ -3101,7 +3101,7 @@ class RasterModelGrid(ModelGrid, RasterModelGridPlotter):
         """*Deprecated*.
 
         .. deprecated:: 0.1
-            Use :func:`calculate_gradient_across_cell_faces`
+            Use :func:`gradient_across_cell_face`
                     or :func:`calculate_gradient_across_cell_corners` instead
         """
         diffs = gfuncs.calculate_diff_at_links(self, node_values, out=out)
@@ -3113,7 +3113,7 @@ class RasterModelGrid(ModelGrid, RasterModelGridPlotter):
         """*Deprecated*.
 
         .. deprecated:: 0.1
-            Use :func:`calculate_gradient_across_cell_faces`
+            Use :func:`gradient_across_cell_face`
                     or :func:`calculate_gradient_across_cell_corners` instead
 
         Calculates the gradient in quantity s at each active link in the grid.
@@ -3160,7 +3160,7 @@ class RasterModelGrid(ModelGrid, RasterModelGridPlotter):
         """*Deprecated*.
 
         .. deprecated:: 0.1
-            Use :func:`calculate_gradient_across_cell_faces`
+            Use :func:`gradient_across_cell_face`
                     or :func:`calculate_gradient_across_cell_corners` instead
         """
 
