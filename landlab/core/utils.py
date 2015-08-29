@@ -12,8 +12,14 @@ def get_functions_from_module(mod, pattern=None):
 
 
 def add_functions_to_class(cls, funcs):
+    import numpydoc
+
     for name, func in funcs.items():
         setattr(cls, name, func)
+
+        doc = numpydoc.docscrape.NumpyDocString(func.__doc__)
+        doc['See Also'] += [(name, ('equivalent function', ), 'func')]
+        func.__doc__ = str(doc)
 
 
 def add_module_functions_to_class(cls, module, pattern=None):
