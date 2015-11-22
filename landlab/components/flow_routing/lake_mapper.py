@@ -38,12 +38,12 @@ class DepressionFinderAndRouter(Component):
     once the fill is performed. Those named "lake" return the unique lakes
     created by the fill, and are probably the properties most users will
     want.
-    
+
     Note also that the structure of drainage within the lakes is not
     guaranteed, and in particular, may not be symmetrical even if your
     boundary conditions are.
     However, the outputs from the lake will all still be correct.
-    
+
     Note the routing part of this component is not yet compatible with
     irregular grids.
     """
@@ -53,7 +53,7 @@ class DepressionFinderAndRouter(Component):
     _input_var_names = set(['topographic__elevation',
                             ])
 
-    _output_var_names = set(['depression__depth',  # depth below spill point
+    _output_var_names = set(['depression__depth',
                              'depression__outlet_node',
                              ])
 
@@ -67,7 +67,7 @@ class DepressionFinderAndRouter(Component):
                     'depression__outlet_node': 'node',
                     }
 
-    _var_defs = {
+    _var_doc = {
         'topographic__elevation': 'Surface topographic elevation',
         'depression__depth': 'Depth of depression below its spillway point',
         'depression__outlet_node':
@@ -178,15 +178,25 @@ class DepressionFinderAndRouter(Component):
         # We'll also need a handy copy of the node neighbor lists
         # TODO: presently, this grid method seems to only exist for Raster
         # grids. We need it for *all* grids!
-        self._node_nbrs = self._grid.get_neighbor_list()
+        self._node_nbrs = self._grid.get_active_neighbors_at_node()
+        dx = self._grid.dx
+        dy = self._grid.dy
         if self._D8:
             diag_nbrs = self._grid.get_diagonal_list()
             self._node_nbrs = np.concatenate((self._node_nbrs, diag_nbrs), 1)
-            self._link_lengths = np.ones(8, dtype=float)
-            self._link_lengths[4:].fill(np.sqrt(2.))
+            self._link_lengths = np.empty(8, dtype=float)
+            self._link_lengths[0] = dx
+            self._link_lengths[2] = dx
+            self._link_lengths[1] = dy
+            self._link_lengths[3] = dy
+            self._link_lengths[4:].fill(np.sqrt(dx*dx + dy*dy))
         elif ((type(self._grid) is landlab.grid.raster.RasterModelGrid) and
-            (self._routing is 'D4')):
-            self._link_lengths = np.ones(4, dtype=float)
+                (self._routing is 'D4')):
+            self._link_lengths = np.empty(4, dtype=float)
+            self._link_lengths[0] = dx
+            self._link_lengths[2] = dx
+            self._link_lengths[1] = dy
+            self._link_lengths[3] = dy
         else:
             self._link_lengths = self._grid.link_length
         self._lake_outlets = []  # a list of each unique lake outlet
@@ -596,12 +606,12 @@ class DepressionFinderAndRouter(Component):
                 self.handle_outlet_node(outlet_node, nodes_in_lake)
                 while (len(nodes_in_lake) + 1) != len(nodes_routed):
                     if self._D8:
-                        all_nbrs = np.hstack((self._grid.get_neighbor_list(
+                        all_nbrs = np.hstack((self._grid.get_active_neighbors_at_node(
                             nodes_on_front),
                             self._grid.get_diagonal_list(
                             nodes_on_front)))
                     else:
-                        all_nbrs = self._grid.get_neighbor_list(nodes_on_front)
+                        all_nbrs = self._grid.get_active_neighbors_at_node(nodes_on_front)
                     outlake = np.logical_not(np.in1d(all_nbrs.flat,
                                                      nodes_in_lake))
                     all_nbrs[outlake.reshape(all_nbrs.shape)] = -1
@@ -636,7 +646,8 @@ class DepressionFinderAndRouter(Component):
         """
         # Calculate drainage area, discharge, and downstr->upstr order
         Q_in = self._grid.at_node['water__volume_flux_in']
-        areas = self._grid.forced_cell_areas
+        areas = self._grid.cell_area_at_node.copy()
+        areas[self._grid.closed_boundary_nodes] = 0.
         self.a, q, s = flow_accum_bw.flow_accumulation(self.receivers,
                                                        np.where(self.sinks)[0],
                                                        node_cell_area=areas,
@@ -644,7 +655,7 @@ class DepressionFinderAndRouter(Component):
         # finish the property updating:
         self._grid.at_node['drainage_area'][:] = self.a
         self._grid.at_node['water__volume_flux'][:] = q
-        self._grid.at_node['upstream_ID_order'][:] = s
+        self._grid.at_node['upstream_node_order'][:] = s
         # ## TODO: No obvious easy way to recover the receiver_link.
         # ## Think more on this.
         # ## Right now, we're just not updating it.
@@ -666,19 +677,20 @@ class DepressionFinderAndRouter(Component):
         """
         if self._grid.status_at_node[outlet_node] == 0:  # it's not a BC
             if self._D8:
-                outlet_neighbors = np.hstack((self._grid.get_neighbor_list(
+                outlet_neighbors = np.hstack((self._grid.get_active_neighbors_at_node(
                     outlet_node),
                     self._grid.get_diagonal_list(
                     outlet_node)))
             else:
-                outlet_neighbors = self._grid.get_neighbor_list(outlet_node).copy()
+                outlet_neighbors = self._grid.get_active_neighbors_at_node(
+                    outlet_node).copy()
             inlake = np.in1d(outlet_neighbors.flat, nodes_in_lake)
             assert inlake.size > 0
             outlet_neighbors[inlake] = -1
             unique_outs, unique_indxs = np.unique(outlet_neighbors,
                                                   return_index=True)
             out_draining = unique_outs[1:]
-            if type(self._grid) is landlab.grid.raster.RasterModelGrid:
+            if isinstance(self._grid, landlab.grid.raster.RasterModelGrid):
                 link_l = self._link_lengths
             else:  # Voronoi
                 link_l = self._link_lengths[self._grid.node_links[:,
@@ -755,7 +767,7 @@ class DepressionFinderAndRouter(Component):
         lake_areas = np.empty(self.number_of_lakes)
         lake_counter = 0
         for lake_code in self.lake_codes:
-            each_cell_in_lake = self._grid.forced_cell_areas[self.lake_map ==
+            each_cell_in_lake = self._grid.cell_area_at_node[self.lake_map ==
                                                              lake_code]
             lake_areas[lake_counter] = each_cell_in_lake.sum()
             lake_counter += 1
@@ -769,7 +781,7 @@ class DepressionFinderAndRouter(Component):
         """
         lake_vols = np.empty(self.number_of_lakes)
         lake_counter = 0
-        col_vols = self._grid.forced_cell_areas * self.depression_depth
+        col_vols = self._grid.cell_area_at_node * self.depression_depth
         for lake_code in self.lake_codes:
             each_cell_in_lake = col_vols[self.lake_map == lake_code]
             lake_vols[lake_counter] = each_cell_in_lake.sum()

@@ -560,9 +560,55 @@ class ModelGrid(ModelDataFields):
         self.update_links_nodes_cells_to_new_BCs()
 
     @property
+    @make_return_array_immutable
+    def neighbors_at_node(self):
+        """Get neighboring nodes.
+
+        Examples
+        --------
+        >>> from landlab import RasterModelGrid, BAD_INDEX_VALUE
+        >>> grid = RasterModelGrid((4, 3))
+        >>> neighbors = grid.neighbors_at_node.copy()
+        >>> neighbors[neighbors == BAD_INDEX_VALUE] = -1
+        >>> neighbors # doctest: +NORMALIZE_WHITESPACE
+        array([[ 1,  3, -1, -1], [ 2,  4,  0, -1], [-1,  5,  1, -1],
+               [ 4,  6, -1,  0], [ 5,  7,  3,  1], [-1,  8,  4,  2],
+               [ 7,  9, -1,  3], [ 8, 10,  6,  4], [-1, 11,  7,  5],
+               [10, -1, -1,  6], [11, -1,  9,  7], [-1, -1, 10,  8]])
+        """
+        return self._neighbors_at_node
+
+    @property
     def node_at_cell(self):
-        """Node ID associated with grid cells"""
+        """Node ID associated with grid cells.
+
+        Examples
+        --------
+        >>> from landlab import RasterModelGrid, BAD_INDEX_VALUE
+        >>> grid = RasterModelGrid((4, 5))
+        >>> grid.node_at_cell # doctest: +NORMALIZE_WHITESPACE
+        array([ 6,  7,  8,
+               11, 12, 13])
+        """
         return self._node_at_cell
+
+    @property
+    def cell_at_node(self):
+        """Node ID associated with grid cells.
+
+        Examples
+        --------
+        >>> from landlab import RasterModelGrid, BAD_INDEX_VALUE
+        >>> grid = RasterModelGrid((4, 5))
+        >>> ids = grid.cell_at_node
+        >>> ids[ids == BAD_INDEX_VALUE] = -1
+        >>> ids # doctest: +NORMALIZE_WHITESPACE
+        array([-1, -1, -1, -1, -1,
+               -1,  0,  1,  2, -1,
+               -1,  3,  4,  5, -1,
+               -1, -1, -1, -1, -1])
+        """
+        return self._cell_at_node
 
     @property
     @return_readonly_id_array
@@ -652,11 +698,6 @@ class ModelGrid(ModelDataFields):
         """Get array of nodes associated with core cells."""
         (core_cell_ids, ) = numpy.where(self._node_status == CORE_NODE)
         return core_cell_ids
-
-    @property
-    def core_cell_index_at_nodes(self):
-        """Get array of core cells associated with nodes."""
-        return self.node_corecell
 
     @property
     def core_cells(self):
@@ -1521,7 +1562,8 @@ class ModelGrid(ModelDataFields):
         node_net_unit_flux = self.calculate_flux_divergence_at_nodes(
             active_link_flux)
 
-        net_unit_flux = node_net_unit_flux[self.corecell_node]
+        node_at_core_cell = self.node_at_cell[self.core_cells]
+        net_unit_flux = node_net_unit_flux[node_at_core_cell]
 
         return net_unit_flux
 
@@ -1548,43 +1590,29 @@ class ModelGrid(ModelDataFields):
 
     @property
     @make_return_array_immutable
-    def cell_areas(self):
-        """Cell areas.
+    def cell_area_at_node(self):
+        """Cell areas in a nnodes-long array.
+
+        Zeros are entered at all perimeter nodes, which lack cells.
 
         Returns
         -------
         ndarray
-            Array of grid-cell areas.
+            Cell areas as an n_nodes-long array.
 
-        Notes
-        -----
-
-        Sometimes it may make sense for a grid to not always calculate
-        its cell areas but, instead, only calculate them once they are
-        required. In such cases, the grid class must implement a
-        _setup_cell_areas_array method, which will be called the first
-        time cell areas are requested.
+        Examples
+        --------
+        >>> from landlab import RasterModelGrid
+        >>> grid = RasterModelGrid((4, 5), spacing=(3, 4))
+        >>> grid.status_at_node[7] = CLOSED_BOUNDARY
+        >>> grid.cell_area_at_node
+        array([  0.,   0.,   0.,   0.,   0.,
+                 0.,  12.,  12.,  12.,   0.,
+                 0.,  12.,  12.,  12.,   0.,
+                 0.,   0.,   0.,   0.,   0.])
         """
         try:
-            return self._cell_areas
-        except AttributeError:
-            return self._setup_cell_areas_array()
-
-    @property
-    @make_return_array_immutable
-    def forced_cell_areas(self):
-        """Cell areas.
-
-        Returns an array of grid cell areas. In the cases of inactive nodes,
-        this method forces the area of those nodes so it can return an nnodes-
-        long array. For a raster, it assumes areas are equal to the normal
-        case.
-
-        For a voronoi, all cells get their true area. Boundary cells with
-        undefined areas get the mean cell area.
-        """
-        try:
-            return self._forced_cell_areas
+            return self._cell_area_at_node
         except AttributeError:
             return self._setup_cell_areas_array_force_inactive()
 
@@ -1597,32 +1625,17 @@ class ModelGrid(ModelDataFields):
             return self._setup_face_widths()
 
     def _setup_cell_areas_array_force_inactive(self):
-        """
-        Sets up an array of cell areas which is nnodes long. Nodes which have
-        cells receive the area of that cell. Nodes which do not receive
-        numpy.nan entries.
-        Note this method is typically only required for some raster purposes,
-        and is overridden in raster.py. It is unlikely this parent method will
-        ever need to be called.
-        """
-        self._forced_cell_areas = numpy.empty(self.number_of_nodes)
-        mean_cell_area = numpy.mean(self.active_cell_areas)
-        self._forced_cell_areas.fill(mean_cell_area)
-        cell_node_ids = self.get_active_cell_node_ids()
-        try:
-            self._forced_cell_areas[cell_node_ids] = self.cell_areas
-        except AttributeError:
-            # in the case of the Voronoi
-            self._forced_cell_areas[cell_node_ids] = self.active_cell_areas
-        return self._forced_cell_areas
+        """Set up an array of cell areas that is n_nodes long.
 
-    def get_active_cell_node_ids(self):
-        """Nodes of active cells.
-
-        Return an integer vector of the node IDs of all active (i.e., core +
-        open boundary) cells.
+        Sets up an array of cell areas that is nnodes long. Nodes that have
+        cells receive the area of that cell. Nodes which do not, receive
+        zeros.
         """
-        return self.activecell_node
+        _cell_area_at_node_zero = numpy.zeros(self.number_of_nodes,
+                                              dtype=float)
+        _cell_area_at_node_zero[self.node_at_cell] = self.area_of_cell
+        self._cell_area_at_node = _cell_area_at_node_zero
+        return self._cell_area_at_node
 
     def get_active_link_connecting_node_pair(self, node1, node2):
         """Get the active link that connects a pair of nodes.
@@ -1653,15 +1666,20 @@ class ModelGrid(ModelDataFields):
         return numpy.array([active_link])
 
     @property
-    def active_link_length(self):
-        """Get array of lengths of active links.
+    @make_return_array_immutable
+    def area_of_cell(self):
+        """Get areas of grid cells.
 
         Returns
         -------
         ndarray
-            Lengths of active links, in ID order.
+            Areas of cells, in ID order.
         """
-        return self.link_length[self.active_link_ids]
+        # return self._area_of_cell
+        try:
+            return self._area_of_cell
+        except AttributeError:
+            return self._setup_cell_areas_array()
 
     @property
     def link_length(self):
@@ -1890,25 +1908,22 @@ class ModelGrid(ModelDataFields):
         * corecell_node *
         * active_cells
         * core_cells
-        * node_corecell
         * _boundary_nodes
+
+        Examples
+        --------
+        >>> import landlab
+        >>> grid = landlab.RasterModelGrid((4, 5))
+        >>> grid.status_at_node[7] = landlab.CLOSED_BOUNDARY
+        >>> grid.core_cells
+        array([0, 2, 3, 4, 5])
         """
-        self.activecell_node = as_id_array(
-            numpy.where(self._node_status != CLOSED_BOUNDARY)[0])
-        self.corecell_node = as_id_array(
-            numpy.where(self._node_status == CORE_NODE)[0])
-        self._num_core_cells = self.corecell_node.size
-        self._num_core_nodes = self._num_core_cells
-        self._num_active_nodes = self.activecell_node.size
-        self._num_active_cells = self._num_core_cells
-        self.active_cells = numpy.arange(self._num_active_cells)
-        self._core_cells = numpy.arange(self._num_core_cells)
-        self.node_corecell = numpy.empty(self.number_of_nodes, dtype=int)
-        self.node_corecell.fill(BAD_INDEX_VALUE)
-        self.node_corecell[self.corecell_node] = self._core_cells
-        self.node_activecell = numpy.empty(self.number_of_nodes, dtype=int)
-        self.node_activecell.fill(BAD_INDEX_VALUE)
-        self.node_activecell.flat[self.activecell_node] = self.active_cells
+        (self._core_nodes, ) = numpy.where(self._node_status == CORE_NODE)
+        self._num_core_nodes = self._core_nodes.size
+
+        self._core_cells = self.cell_at_node[self._core_nodes]
+        self._num_core_cells = self._core_cells.size
+
         self._boundary_nodes = as_id_array(
             numpy.where(self._node_status != CORE_NODE)[0])
 
@@ -1957,12 +1972,17 @@ class ModelGrid(ModelDataFields):
         >>> from landlab import RasterModelGrid
         >>> mg = RasterModelGrid(3, 4, 1.0)
         >>> mg.status_at_node
-        array([1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1], dtype=int8)
-        >>> h = np.array([-9999, -9999, -9999, -9999, -9999, -9999, 12345.,
-        ...     0., -9999, 0., 0., 0.])
+        array([1, 1, 1, 1,
+               1, 0, 0, 1,
+               1, 1, 1, 1], dtype=int8)
+        >>> h = np.array([-9999, -9999, -9999, -9999,
+        ...               -9999, -9999, 12345.,   0.,
+        ...               -9999,    0.,     0.,   0.])
         >>> mg.set_nodata_nodes_to_inactive(h, -9999)
         >>> mg.status_at_node
-        array([4, 4, 4, 4, 4, 4, 0, 1, 4, 1, 1, 1], dtype=int8)
+        array([4, 4, 4, 4,
+               4, 4, 0, 1,
+               4, 1, 1, 1], dtype=int8)
         """
         self.set_nodata_nodes_to_closed(node_data, nodata_value)
 

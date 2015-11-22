@@ -1,11 +1,12 @@
 from __future__ import print_function
 
 import numpy as np
-from landlab import ModelParameterDictionary
+from landlab import ModelParameterDictionary, CLOSED_BOUNDARY
 from time import sleep
 
 from landlab.core.model_parameter_dictionary import MissingKeyError
 from landlab.field.scalar_data_fields import FieldError
+
 
 class TransportLimitedEroder(object):
     """
@@ -224,8 +225,8 @@ class TransportLimitedEroder(object):
             self.shields_prefactor_noD = 1./((self.sed_sensity-self.fluid_density)*self.g)
 
         self.cell_areas = np.empty(grid.number_of_nodes)
-        self.cell_areas.fill(np.mean(grid.cell_areas))
-        self.cell_areas[grid.node_at_cell] = grid.cell_areas
+        self.cell_areas.fill(np.mean(grid.area_of_cell))
+        self.cell_areas[grid.node_at_cell] = grid.area_of_cell
 
 
     def sed_capacity_equation(self, grid, shields_stress, slopes_at_nodes=None, areas_at_node=None):
@@ -289,7 +290,7 @@ class TransportLimitedEroder(object):
     def weave_iter_sed_trp_balance(self, grid, capacity, r, s, dt):
         '''
         Needs to be passed at node values for 'flow_receiver' and
-        'upstream_ID_order' (i.e., r and s). These are most likely the output
+        'upstream_node_order' (i.e., r and s). These are most likely the output
         values from route_flow_dn.
         Returns dz/dt, the rate of elevation change.
         '''
@@ -329,7 +330,7 @@ class TransportLimitedEroder(object):
 
     def erode(self, grid, dt, node_drainage_areas='drainage_area',
                 slopes_at_nodes=None, link_slopes=None, link_node_mapping='links_to_flow_receiver',
-                receiver='flow_receiver', upstream_order='upstream_ID_order',
+                receiver='flow_receiver', upstream_order='upstream_node_order',
                 slopes_from_elevs=None, W_if_used=None, Q_if_used=None,
                 Dchar_if_used=None, io=None):
 
@@ -472,7 +473,7 @@ class TransportLimitedEroder(object):
         #print "s: ", s_in
         dz = self.weave_iter_sed_trp_balance(grid, capacity, r_in, s_in, dt)
         #print 'max inc rate ', np.amax(np.fabs(dz[self.grid.core_nodes]))
-        active_nodes = grid.get_active_cell_node_ids()
+        active_nodes = np.where(grid.status_at_node != CLOSED_BOUNDARY)[0]
         if io:
             try:
                 io[active_nodes] += dz[active_nodes]

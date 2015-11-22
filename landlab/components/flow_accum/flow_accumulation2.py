@@ -9,7 +9,7 @@
 from __future__ import print_function
 
 import landlab
-from landlab import ModelParameterDictionary
+from landlab import ModelParameterDictionary, CLOSED_BOUNDARY
 import numpy as np
 
 
@@ -29,7 +29,7 @@ class AccumFlow(object):
         self.flow_accum_by_area = np.zeros(grid.number_of_nodes+1) #prefilled with zeros, size of WHOLE grid+1, to allow -1 ids
 
     def calc_flowacc(self, grid, z, flowdirs):
-        active_cell_ids = grid.get_active_cell_node_ids()
+        active_cell_ids = np.where(grid.status_at_node != CLOSED_BOUNDARY)[0]
         #Perform test to see if the flowdir data is a single vector, or multidimensional, here. Several ways possible: 1. Is the vector multidimensional?, e.g., try: data.flowdirs.shape[1] 2. set a flag in flowdir.
 
         try:
@@ -41,8 +41,8 @@ class AccumFlow(object):
             sorted_flowdirs = (flowdirs[active_cell_ids])[height_order_active_cells]
         except:
             print('Flow directions could not be sorted by elevation. Does the data object contain the flow direction vector?')
-        #print grid.cell_areas
-        self.flow_accum_by_area[active_cell_ids] = grid.cell_areas #This is only the active nodes == cells by definition
+        # print grid.area_of_cell
+        self.flow_accum_by_area[active_cell_ids] = grid.area_of_cell # This is only the active nodes == cells by definition
 
         #print len(height_order_active_cells), len(sorted_flowdirs), len(self.flow_accum_by_area)
         #print height_order_active_cells
