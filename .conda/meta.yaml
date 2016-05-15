@@ -8,7 +8,7 @@ source:
 
 requirements:
   build:
-    - python =={{environ.get('PYTHON_VERSION', '2.7')}}
+    - python
     - scipy
     - numpy =={{environ.get('NUMPY_VERSION', '1.10')}}
     - nose
@@ -23,7 +23,7 @@ requirements:
     - setuptools
 
   run:
-    - python =={{environ.get('PYTHON_VERSION', '2.7')}}
+    - python
     - scipy
     - numpy =={{environ.get('NUMPY_VERSION', '1.10')}}
     - nose
