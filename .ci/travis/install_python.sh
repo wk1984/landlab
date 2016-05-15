@@ -15,6 +15,7 @@ export PATH="$HOME/miniconda/bin:$PATH"
 hash -r
 conda config --set always_yes yes --set changeps1 no
 # conda update conda
+conda install python=$PYTHON_VERSION
 conda info -a
 cat requirements.txt | grep -v numpydoc | xargs conda create -n test-env python=$PYTHON_VERSION
 conda install conda-build
