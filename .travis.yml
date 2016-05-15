@@ -10,6 +10,7 @@ env:
   - TRAVIS_PYTHON_VERSION="3.5" NUMPY_VERSION="1.10"
   global:
     secure: UxPkdFKl0xtk+H+98CNHSnYN8SJrEq5xJjLtPUPR+5UF5lLKL7godwrOdYeO0B0fXPi2Plw0vtoIID6H1AV4x+8QD/AgAizoWIh8KLim3E7rDX0v0M3WnUHctvYwt76mGCYvIGH6qR2Ziml37Ec6nz2aTuz0oex27P6dq0BKkXs=
+    secure: OFyhYR18rMC/MlyG1J8+cRkHWlkn/BOkQP6IM+ZBILG/t33ipoyTjH2qpNJi5Rx3wMCXBn00XnPExf7mqRBAAzSULyt6t6eDbXgInYOCSOQMMZlJ66CdmsD8dKBwDVbcFuGz06amYrIc/22guFP+6GfhsCepHvocrR93A93whug=
 os:
 - linux
 - osx
@@ -38,6 +39,7 @@ virtualenv:
   system_site_packages: false
 after_success:
   - bash .ci/travis/deploy_to_pypi.sh
+  - bash .ci/travis/deploy_to_anaconda.sh
   - coveralls
 deploy:
   provider: pypi
