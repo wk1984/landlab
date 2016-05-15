@@ -33,6 +33,8 @@ install:
 - conda install numpy=$NUMPY_VERSION
 - conda build .conda
 - conda install landlab --use-local
+- export CONDA_PACKAGE_FILE=$(conda build .conda --output)
+- echo "Package to upload: $CONDA_PACKAGE_FILE"
 script:
 - bash .ci/travis/run_travis_test.sh
 virtualenv:
