@@ -5,7 +5,7 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
 else
     OS="Linux-x86_64";
 fi
-if [[ "$TRAVIS_PYTHON_VERSION" == 2.* ]]; then
+if [[ "$PYTHON_VERSION" == 2.* ]]; then
       wget http://repo.continuum.io/miniconda/Miniconda-latest-$OS.sh -O miniconda.sh;
 else
       wget http://repo.continuum.io/miniconda/Miniconda3-latest-$OS.sh -O miniconda.sh;
@@ -16,7 +16,7 @@ hash -r
 conda config --set always_yes yes --set changeps1 no
 # conda update conda
 conda info -a
-cat requirements.txt | grep -v numpydoc | xargs conda create -n test-env python=$TRAVIS_PYTHON_VERSION
+cat requirements.txt | grep -v numpydoc | xargs conda create -n test-env python=$PYTHON_VERSION
 conda install conda-build
 source activate test-env
 conda install anaconda-client

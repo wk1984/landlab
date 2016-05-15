@@ -10,7 +10,7 @@ fi
 
 conda config --set anaconda_upload no
 
-file_to_upload=$(conda build --output --python=$TRAVIS_PYTHON_VERSION .conda)
+file_to_upload=$(conda build --output .conda)
 file_to_upload=$(echo $file_to_upload | rev | cut -d ' ' -f 1 | rev)
 
 echo "Building conda package"
