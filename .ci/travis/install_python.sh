@@ -17,7 +17,8 @@ conda config --set always_yes yes --set changeps1 no
 # conda update conda
 conda info -a
 cat requirements.txt | grep -v numpydoc | xargs conda create -n test-env python=$TRAVIS_PYTHON_VERSION
-conda install conda-build anaconda-client
+conda install conda-build
 source activate test-env
+conda install anaconda-client
 conda install coverage
 conda install sphinx
