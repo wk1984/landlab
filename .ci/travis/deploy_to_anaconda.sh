@@ -15,9 +15,10 @@ else
   file_to_upload=$(conda build --output --python=$TRAVIS_PYTHON_VERSION --numpy=$NUMPY_VERSION .conda)
 
   echo "Building conda package"
-  conda build .conda -c landlab > stdout || exit -1
+  conda build .conda -c landlab || exit -1
 
   echo "Uploading to Anaconda"
+  echo anaconda -t $ANACONDA_TOKEN upload --force --user landlab --channel $BUILD_STR $file_to_upload
   anaconda -t $ANACONDA_TOKEN upload --force --user landlab --channel $BUILD_STR $file_to_upload
 
   echo "Done."
