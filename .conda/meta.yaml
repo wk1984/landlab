@@ -7,9 +7,9 @@ source:
 
 requirements:
   build:
-    - python
+    - python =={{environ.get('PYTHON_VERSION', '2.7')}}
     - scipy
-    - numpy >=1.10
+    - numpy =={{environ.get('NUMPY_VERSION', '1.10')}}
     - nose
     - matplotlib
     - numpydoc
@@ -22,9 +22,9 @@ requirements:
     - setuptools
 
   run:
-    - python
+    - python =={{environ.get('PYTHON_VERSION', '2.7')}}
     - scipy
-    - numpy >=1.10
+    - numpy =={{environ.get('NUMPY_VERSION', '1.10')}}
     - nose
     - matplotlib
     - numpydoc
