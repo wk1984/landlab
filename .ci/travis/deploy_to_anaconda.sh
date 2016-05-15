@@ -10,13 +10,15 @@ if [[ "$TRAVIS_TAG" == v* ]]; then
 
   echo "Done."
 else
-  file_to_upload=$(conda build --output --python=$TRAVIS_PYTHON_VERSION --numpy=$NUMPY_VERSION .conda)
+  echo conda build --output --python=$TRAVIS_PYTHON_VERSION .conda
+  file_to_upload=$(conda build --output --python=$TRAVIS_PYTHON_VERSION .conda)
 
   echo "Building conda package"
   conda build .conda -c landlab || exit -1
 
   echo "Uploading to Anaconda"
   echo anaconda -t $ANACONDA_TOKEN upload --force --user landlab --channel dev $file_to_upload
+  echo File to upload $file_to_upload
   anaconda -t $ANACONDA_TOKEN upload --force --user landlab --channel dev $file_to_upload
 
   echo "Done."
