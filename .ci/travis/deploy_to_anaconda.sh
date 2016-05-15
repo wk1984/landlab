@@ -7,7 +7,7 @@ else
   export BUILD_STR="dev"
   export CHANNEL="dev"
 fi
-
+echo "Building package for Python $PYTHON_VERSION, numpy $NUMPY_VERSION"
 conda config --set anaconda_upload no
 
 file_to_upload=$(conda build --output .conda)
