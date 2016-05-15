@@ -4,14 +4,16 @@ if (($env:appveyor_repo_tag -eq "true") -and ($env:appveyor_repo_tag_name.Starts
 } else {
     write-output "Deploying to anaconda dev channel..."
     $channel = "dev"
+    $env:BUILD_STR = "dev"
 }
 
-$file_to_upload = (conda build --output --python=$env.PYTHON_VERSION .conda) | Out-String
+Invoke-Expression "conda config --set anaconda_upload no"
 
 write-output "Building package..."
 Invoke-Expression "conda build .conda -c landlab"
 
+$file_to_upload = (conda build --output --python=$env.PYTHON_VERSION .conda) | Out-String
+write-output "Uploading file $file_to_upload..."
 Invoke-Expression "anaconda -t $env:ANACONDA_TOKEN upload --force --user landlab --channel $channel $file_to_upload"
 
-write-output "Uploading file $file_to_upload..."
 write-output "OK"
