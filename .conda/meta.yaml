@@ -1,0 +1,38 @@
+package:
+  name: landlab
+  version: "1.0.0beta"
+
+source:
+  git_url: https://github.com/landlab/landlab
+
+requirements:
+  build:
+    - python
+    - scipy
+    - numpy
+    - nose
+    - matplotlib
+    - numpydoc
+    - netcdf4
+    - sympy
+    - pandas
+    - cython
+    - six
+    - setuptools
+
+  run:
+    - python
+    - scipy
+    - numpy
+    - nose
+    - matplotlib
+    - numpydoc
+    - netcdf4
+    - sympy
+    - pandas
+    - cython
+    - six
+    - setuptools
+
+build:
+  string: {{ environ.get('BUILD_STR', '') }}
