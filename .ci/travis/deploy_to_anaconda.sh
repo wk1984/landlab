@@ -1,6 +1,3 @@
-echo "Installing deployment requirements."
- conda install conda-build anaconda-client
-
 if [[ "$TRAVIS_TAG" == v* ]]; then
 
   file_to_upload=$(conda build --output --python=$TRAVIS_PYTHON_VERSION --numpy=$NUMPY_VERSION .conda)
