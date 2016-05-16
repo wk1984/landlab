@@ -17,9 +17,10 @@ conda config --set always_yes yes --set changeps1 no
 # conda update conda
 conda install python=$PYTHON_VERSION
 conda info -a
-cat requirements.txt | grep -v numpydoc | xargs conda create -n test-env python=$PYTHON_VERSION
+# cat requirements.txt | grep -v numpydoc | xargs conda create -n test-env python=$PYTHON_VERSION
+# conda create -n test-env python=$PYTHON_VERSION
 conda install conda-build
-source activate test-env
+# source activate test-env
 conda install anaconda-client
 conda install coverage
 conda install sphinx
