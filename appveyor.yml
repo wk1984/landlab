@@ -53,8 +53,9 @@ install:
 build: false
 
 test_script:
-  #- "%WITH_COMPILER% python setup.py build_ext --inplace"
-  #- "%WITH_COMPILER% python coupled_driver.py"
+  - IF "%PLATFORM%"=="x64" (SET SUFFIX="-x64") ELSE (SET SUFFIX="")
+  - "SET PATH=%PYTHON%%SUFFIX%;%PYTHON%%SUFFIX%\\Scripts;%PATH%"
+  - ECHO "Using %PYTHON%%SUFFIX%"
   - "%WITH_COMPILER% python scripts/test-installed-landlab.py"
 
 after_test:
