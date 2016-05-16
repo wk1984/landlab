@@ -30,43 +30,6 @@ import numpy as np
 __version__ = '0.5.0'
 
 
-def register(**kwds):
-    import httplib, urllib
-
-    data = urllib.urlencode(kwds)
-    header = {"Content-type": "application/x-www-form-urlencoded",
-              "Accept": "text/plain"}
-    conn = httplib.HTTPConnection('csdms.colorado.edu')
-    conn.request('POST', '/register/', data, header)
-
-
-def register_landlab():
-    try:
-        from sys import argv
-        import platform
-        data = {
-            'name': 'landlab',
-            'version': __version__,
-            'platform': platform.platform(),
-            'desc': ';'.join(argv),
-        }
-        register(**data)
-    except Exception:
-        pass
-
-
-class install_and_register(install):
-    def run(self):
-        install.run(self)
-        register_landlab()
-
-
-class develop_and_register(develop):
-    def run(self):
-        develop.run(self)
-        register_landlab()
-
-
 import os
 
 #cython_pathspec = os.path.join('landlab', 'components','**','*.pyx')
@@ -104,10 +67,6 @@ setup(name='landlab',
       package_data={'': ['tests/*txt', 'data/*asc', 'data/*nc',
                          'preciptest.in']},
       test_suite='nose.collector',
-      cmdclass={
-          'install': install_and_register,
-          'develop': develop_and_register,
-      },
       entry_points={
           'console_scripts': [
               'landlab=landlab.cmd.landlab:main',
