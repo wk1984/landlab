@@ -55,7 +55,8 @@ test_script:
   - "SET PATH=%PYTHON%%SUFFIX%;%PYTHON%%SUFFIX%\\Scripts;%PATH%"
   - ECHO "Using %PYTHON%%SUFFIX%"
   - "%WITH_COMPILER% conda build -q .conda"
-  - "%WITH_COMPILER% conda install -q --yes landlab --use-local"
+  # - "%WITH_COMPILER% conda install -q --yes landlab --use-local"
+  - "%WITH_COMPILER% python setup.py install"
   - "%WITH_COMPILER% python scripts/test-installed-landlab.py"
 
 after_test:
