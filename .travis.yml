@@ -34,7 +34,7 @@ install:
 - conda build --output .conda
 - conda build .conda
 - conda install landlab --use-local
-- CONDA_PACKAGE_FILE=$(conda build .conda --output)
+- CONDA_PACKAGE_FILE=$(conda build --output .conda | tail -n 1)
 - echo "Package to upload: $CONDA_PACKAGE_FILE"
 - export CONDA_PACKAGE_FILE
 script:
