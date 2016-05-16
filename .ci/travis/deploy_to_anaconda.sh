@@ -13,12 +13,12 @@ conda config --set anaconda_upload no
 # file_to_upload=$(conda build --output .conda)
 # file_to_upload=$(echo $file_to_upload | rev | cut -d ' ' -f 1 | rev)
 
-file_to_upload=$CONDA_PACKAGE_FILE
+# file_to_upload=$CONDA_PACKAGE_FILE
 
 # echo "Building conda package"
 # conda build .conda -c landlab || exit -1
 
-echo "Uploading $file_to_upload to $CHANNEL"
-anaconda -t $ANACONDA_TOKEN upload --force --user landlab --channel $CHANNEL $file_to_upload
+echo "Uploading to $CHANNEL"
+anaconda -t $ANACONDA_TOKEN upload --force --user landlab --channel $CHANNEL $HOME/miniconda/conda-bld/**/landlab*bz2
 
 echo "Done."
