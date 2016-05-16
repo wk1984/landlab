@@ -10,7 +10,7 @@ requirements:
   build:
     - python
     - scipy
-    - numpy environ.get('NUMPY_VERSION', '')}}
+    - numpy {{environ.get('NUMPY_VERSION', '')}}
     - nose
     - matplotlib
     - numpydoc
@@ -25,7 +25,7 @@ requirements:
   run:
     - python
     - scipy
-    - numpy environ.get('NUMPY_VERSION', '')}}
+    - numpy {{environ.get('NUMPY_VERSION', '')}}
     - nose
     - matplotlib
     - numpydoc
