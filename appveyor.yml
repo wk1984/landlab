@@ -37,17 +37,15 @@ install:
   - "SET PATH=%PYTHON%%SUFFIX%;%PYTHON%%SUFFIX%\\Scripts;%PATH%"
   - ECHO "Using %PYTHON%%SUFFIX%"
   # - "conda create -q --yes -n test python=%PYTHON_VERSION%"
-  - "conda install -q --yes conda-build"
-  - "conda install -q --yes anaconda-client"
+  - "%WITH_COMPILER% conda install -q --yes conda-build"
+  - "%WITH_COMPILER% conda install -q --yes anaconda-client"
   # - "activate test"
-  - "conda install -q --yes python=%PYTHON_VERSION%"
-  - "python --version"
+  - "%WITH_COMPILER% conda install -q --yes python=%PYTHON_VERSION%"
+  - "%WITH_COMPILER% python --version"
   # - "conda install -q --yes pip jinja2 scipy nose>=1.3 matplotlib netCDF4 sympy pandas Cython pyyaml"
   # - "conda install -q --yes numpy=%NUMPY_VERSION%"
   - "pip install wheel"
   - "pip install twine"
-  - "conda build -q .conda"
-  - "conda install -q --yes landlab --use-local"
   # - "%WITH_COMPILER% python setup.py install"
 
 build: false
@@ -56,6 +54,8 @@ test_script:
   - IF "%PLATFORM%"=="x64" (SET SUFFIX="-x64") ELSE (SET SUFFIX="")
   - "SET PATH=%PYTHON%%SUFFIX%;%PYTHON%%SUFFIX%\\Scripts;%PATH%"
   - ECHO "Using %PYTHON%%SUFFIX%"
+  - "%WITH_COMPILER% conda build -q .conda"
+  - "%WITH_COMPILER% conda install -q --yes landlab --use-local"
   - "%WITH_COMPILER% python scripts/test-installed-landlab.py"
 
 after_test:
