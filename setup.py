@@ -26,7 +26,8 @@ ext_modules = [
 
 import numpy as np
 
-from landlab import __version__
+# from landlab import __version__
+__version__ = '0.5.0'
 
 
 def register(**kwds):
