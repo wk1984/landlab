@@ -47,7 +47,7 @@ install:
   - "pip install wheel"
   - "pip install twine"
   - "conda build .conda"
-  - "conda install landlab --use-local"
+  - "conda install -q --yes landlab --use-local"
   # - "%WITH_COMPILER% python setup.py install"
 
 build: false
