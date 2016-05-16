@@ -15,8 +15,6 @@ requirements:
     - matplotlib
     - numpydoc
     - netcdf4
-    - sympy
-    - pandas
     - cython
     - six
     - pyyaml
@@ -30,8 +28,6 @@ requirements:
     - matplotlib
     - numpydoc
     - netcdf4
-    - sympy
-    - pandas
     - cython
     - six
     - pyyaml
