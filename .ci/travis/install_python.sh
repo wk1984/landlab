@@ -19,8 +19,8 @@ conda install python=$PYTHON_VERSION
 conda info -a
 # cat requirements.txt | grep -v numpydoc | xargs conda create -n test-env python=$PYTHON_VERSION
 # conda create -n test-env python=$PYTHON_VERSION
-conda install conda-build
+conda install -q conda-build
 # source activate test-env
-conda install anaconda-client
-conda install coverage
-conda install sphinx
+conda install -q anaconda-client
+conda install -q coverage
+conda install -q sphinx

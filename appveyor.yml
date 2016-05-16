@@ -46,7 +46,7 @@ install:
   # - "conda install -q --yes numpy=%NUMPY_VERSION%"
   - "pip install wheel"
   - "pip install twine"
-  - "conda build .conda"
+  - "conda build -q .conda"
   - "conda install -q --yes landlab --use-local"
   # - "%WITH_COMPILER% python setup.py install"
 
